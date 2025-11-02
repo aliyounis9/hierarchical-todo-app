@@ -14,3 +14,6 @@ Flask-Cors==4.0.0        # Cross-origin resource sharing
 
 # Environment and configuration
 python-dotenv==1.0.0     # Environment variable loading
+
+# Testing framework
+pytest==8.4.2           # Testing framework for running the test suite
