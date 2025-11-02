@@ -119,11 +119,6 @@ hierarchical-todo-app/
    pip install -r requirements.txt
    ```
 
-4. **Initialize the database:**
-   ```bash
-   python app.py
-   ```
-
 ### Frontend Setup
 1. **Navigate to the frontend directory:**
    ```bash
