@@ -13,7 +13,7 @@
 import React, { useState } from 'react';
 import { tasks, lists } from '../api';
 
-const Task = ({ task, onTaskUpdate, onTaskDelete, level = 0, availableLists = [], onTaskMove }) => {
+const Task = ({ task, onTaskUpdate, onTaskDelete, level = 0, availableLists = [], onTaskMove, showCompleted = true }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState(task.title);
@@ -32,13 +32,6 @@ const Task = ({ task, onTaskUpdate, onTaskDelete, level = 0, availableLists = []
   const hasChildren = task.children && task.children.length > 0;
   const indentStyle = { marginLeft: `${level * 20}px` };
 
-  // Urgency color mapping
-  const urgencyColors = {
-    low: '#28a745',      // Green
-    medium: '#ffc107',   // Yellow  
-    high: '#fd7e14',     // Orange
-    urgent: '#dc3545'    // Red
-  };
 
   const urgencyLabels = {
     low: '🟢',
@@ -47,14 +40,6 @@ const Task = ({ task, onTaskUpdate, onTaskDelete, level = 0, availableLists = []
     urgent: '🔴'
   };
 
-  // Debug logging
-  console.log('Task debug:', {
-    taskId: task.id,
-    level: level,
-    availableListsCount: availableLists.length,
-    shouldShowMoveButton: level === 0 && availableLists.length > 1
-  });
-
   // Toggle task completion
   const handleToggleComplete = async () => {
     setLoading(true);
@@ -62,7 +47,7 @@ const Task = ({ task, onTaskUpdate, onTaskDelete, level = 0, availableLists = []
       await tasks.update(task.id, { completed: !task.completed });
       onTaskUpdate();
     } catch (error) {
-      console.error('Failed to update task:', error);
+      // Silently handle error - user can retry if task doesn't update
     } finally {
       setLoading(false);
     }
@@ -80,7 +65,7 @@ const Task = ({ task, onTaskUpdate, onTaskDelete, level = 0, availableLists = []
       setIsEditing(false);
       onTaskUpdate();
     } catch (error) {
-      console.error('Failed to update task:', error);
+      // Silently handle error - user can retry editing
     } finally {
       setLoading(false);
     }
@@ -102,7 +87,7 @@ const Task = ({ task, onTaskUpdate, onTaskDelete, level = 0, availableLists = []
         await tasks.delete(task.id);
         onTaskDelete();
       } catch (error) {
-        console.error('Failed to delete task:', error);
+        // Silently handle error - user can retry deletion
       } finally {
         setLoading(false);
       }
@@ -114,7 +99,7 @@ const Task = ({ task, onTaskUpdate, onTaskDelete, level = 0, availableLists = []
     if (!subtaskTitle.trim()) return;
 
     setLoading(true);
-    setSubtaskError(''); // Clear any previous errors
+    setSubtaskError('');
     try {
       await tasks.createSubtask(task.id, {
         title: subtaskTitle,
@@ -127,16 +112,10 @@ const Task = ({ task, onTaskUpdate, onTaskDelete, level = 0, availableLists = []
       setShowAddSubtask(false);
       onTaskUpdate();
     } catch (error) {
-      console.error('Failed to create subtask:', error);
-      console.error('Error response:', error.response);
-      
-      // Check if it's a depth limit error
+      // Handle error and show user-friendly message
       const errorMessage = error.message || (error.response?.data?.error) || (error.response?.data?.message) || 'Unknown error';
-      console.log('Error message from server:', errorMessage);
       
-      if (errorMessage.includes('Maximum nesting depth reached') || errorMessage.includes('nesting depth')) {
-        setSubtaskError('Cannot create more than 5 levels of nested tasks.');
-      } else if (errorMessage.includes('depth')) {
+      if (errorMessage.includes('Maximum nesting depth reached') || errorMessage.includes('nesting depth') || errorMessage.includes('depth')) {
         setSubtaskError('Cannot create more than 5 levels of nested tasks.');
       } else if (error.response?.data?.error) {
         setSubtaskError(error.response.data.error);
@@ -160,7 +139,6 @@ const Task = ({ task, onTaskUpdate, onTaskDelete, level = 0, availableLists = []
         onTaskMove(); // Callback to refresh the current view
       }
     } catch (error) {
-      console.error('Failed to move task:', error);
       alert('Failed to move task: ' + error.message);
     } finally {
       setLoading(false);
@@ -191,7 +169,6 @@ const Task = ({ task, onTaskUpdate, onTaskDelete, level = 0, availableLists = []
         onTaskMove(); // Callback to refresh the current view
       }
     } catch (error) {
-      console.error('Failed to create list and move task:', error);
       alert('Failed to create new list: ' + error.message);
     } finally {
       setLoading(false);
@@ -465,7 +442,9 @@ const Task = ({ task, onTaskUpdate, onTaskDelete, level = 0, availableLists = []
       {/* Render children (subtasks) */}
       {hasChildren && !isCollapsed && (
         <div className="task-children">
-          {task.children.map((child) => (
+          {task.children
+            .filter(child => showCompleted || !child.completed)
+            .map((child) => (
             <Task
               key={child.id}
               task={child}
@@ -474,6 +453,7 @@ const Task = ({ task, onTaskUpdate, onTaskDelete, level = 0, availableLists = []
               level={level + 1}
               availableLists={availableLists}
               onTaskMove={onTaskMove}
+              showCompleted={showCompleted}
             />
           ))}
         </div>

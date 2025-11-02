@@ -533,10 +533,10 @@ def uncheck_all_tasks(list_id):
         # Get all tasks in the list (both top-level and children)
         all_tasks = Task.query.filter_by(list_id=list_id, user_id=current_user.id).all()
 
-        # Mark all tasks as incomplete
+        # Mark all tasks as incomplete directly (no cascading logic needed)
         for task in all_tasks:
-            if task.completed:
-                task.mark_incomplete(cascade=False)  # No cascading needed
+            task.completed = False
+            task.completed_at = None
 
         db.session.commit()
 

@@ -23,6 +23,7 @@ const TaskList = ({ selectedListId, onBackToLists }) => {
   const [newTaskTitle, setNewTaskTitle] = useState('');
   const [newTaskDescription, setNewTaskDescription] = useState('');
   const [newTaskUrgency, setNewTaskUrgency] = useState('medium');
+  const [showCompleted, setShowCompleted] = useState(false); // Toggle for showing/hiding completed tasks
 
   // Load available lists for moving tasks between lists
   const loadAvailableLists = async () => {
@@ -168,6 +169,14 @@ const TaskList = ({ selectedListId, onBackToLists }) => {
             >
               ❌ Uncheck All
             </button>
+            <button 
+              onClick={() => setShowCompleted(!showCompleted)}
+              disabled={loading || allTasks.length === 0}
+              className="bulk-btn toggle-completed"
+              title={showCompleted ? "Hide completed tasks" : "Show completed tasks"}
+            >
+              {showCompleted ? '👁️ Hide Completed' : '👁️‍🗨️ Show Completed'}
+            </button>
           </div>
         </div>
         <h2>{taskList.name}</h2>
@@ -246,7 +255,9 @@ const TaskList = ({ selectedListId, onBackToLists }) => {
           </div>
         ) : (
           <div className="tasks-list">
-            {allTasks.map((task) => (
+            {allTasks
+              .filter(task => showCompleted || !task.completed)
+              .map((task) => (
               <Task
                 key={task.id}
                 task={task}
@@ -255,6 +266,7 @@ const TaskList = ({ selectedListId, onBackToLists }) => {
                 level={0}
                 availableLists={availableLists}
                 onTaskMove={handleTaskMove}
+                showCompleted={showCompleted}
               />
             ))}
           </div>

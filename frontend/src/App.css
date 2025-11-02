@@ -1050,6 +1050,15 @@
   background: #c82333;
 }
 
+.toggle-completed {
+  background: #6c757d;
+  color: white;
+}
+
+.toggle-completed:hover:not(:disabled) {
+  background: #5a6268;
+}
+
 .bulk-btn:disabled {
   background: #6c757d;
   cursor: not-allowed;
