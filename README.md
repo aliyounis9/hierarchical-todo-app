@@ -69,21 +69,21 @@ hierarchical-todo-app/
 ├── frontend/
 │   ├── package.json      # Node.js dependencies and scripts
 │   ├── package-lock.json # Locked dependency versions
-  ├── public/           # Static assets
-  │   ├── index.html    # Main HTML template
-  │   ├── icon.svg      # Custom todo app icon
-  │   └── manifest.json # Web app manifest
-   └── src/
-       ├── App.js        # Main React application
-       ├── App.css       # Application styles
-       ├── api.js        # API utility functions
-       ├── index.js      # React entry point
-       ├── index.css     # Global styles
-       └── components/   # React components
-           ├── AuthForm.js      # Login/Register component
-           ├── Dashboard.js     # Main dashboard component
-           ├── Task.js          # Individual task component
-           └── TaskList.js      # Task list component
+│   ├── public/           # Static assets
+│   │   ├── index.html    # Main HTML template
+│   │   ├── icon.svg      # Custom todo app icon
+│   │   └── manifest.json # Web app manifest
+│   └── src/
+│       ├── App.js        # Main React application
+│       ├── App.css       # Application styles
+│       ├── api.js        # API utility functions
+│       ├── index.js      # React entry point
+│       ├── index.css     # Global styles
+│       └── components/   # React components
+│           ├── AuthForm.js      # Login/Register component
+│           ├── Dashboard.js     # Main dashboard component
+│           ├── Task.js          # Individual task component
+│           └── TaskList.js      # Task list component
 └── tests/
     ├── __init__.py       # Python package marker
     ├── conftest.py       # Test configuration and fixtures
