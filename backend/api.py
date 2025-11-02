@@ -470,8 +470,15 @@ def move_task_to_list(task_id):
         return jsonify({"error": "Destination list not found"}), 404
 
     try:
-        # Update the task's list_id
-        task.list_id = new_list_id
+        # Helper function to recursively update list_id for all descendants
+        def update_descendants_list_id(parent_task, new_list_id):
+            """Recursively update list_id for a task and all its descendants"""
+            parent_task.list_id = new_list_id
+            for child in parent_task.children:
+                update_descendants_list_id(child, new_list_id)
+
+        # Update the task and all its children's list_id
+        update_descendants_list_id(task, new_list_id)
         db.session.commit()
 
         return jsonify(
